@@ -137,3 +137,21 @@ Address Space:
 Each thread has its own stack & copy of cpu registers.<br/>
 Shared memory between threads: heap, global vars, static objects.<br/>
 Thread "yield" operation gives up the CPU to another thread (context switch).
+
+# Synchronization
+
+Lock, Mutex, Monitor, Semaphore, Condition variable
+
+```
+| T1 > balance = get_balance(account)
+| T1 > balance = balance - amount
+| T2 > balance = get_balance(account)     \
+| T2 > balance = balance - amount          - context switch
+| T2 > save_balance(account, balance)     /
+| T1 > print_balance(account, balance)
+```
+
+Race condition - operation is not executed in proper sequence.<br/>
+When this happens we need some mechanism to be ensured that all ok.<br/>
+Code that uses mutual exclusion to sync its execution called critical section.<br/>
+Only 1 thread at time can execute in the critical section (all other threads will wait).
