@@ -296,3 +296,57 @@ $ ls -ia /var/log (inode 3633723)
 | triple indirect | - pointer to the next disk block (file <= 4TB)
 -------------------
 ```
+
+# Sockets
+
+```
+User -> Sockets -> OS -> TCP/UDP -> IP -> Ethernet
+Socket = protocol + host + port (ex: 'tcp, 192.44.235.1, 80')
+```
+```
+------------            ------------
+|   Send   |            |   Recv   |
+------------            ------------
+     \                        /
+------------            ------------
+|  Socket  |            |  Socket  |
+------------            ------------
+     \                        /
+------------            ------------
+|   TCP    |            |    TCP   |
+------------            ------------
+     \ sk_buff        sk_buff /
+------------            ------------
+|    IP    |            |    IP    |
+------------            ------------
+     \                        /
+------------            ------------
+| Ethernet | <--------> | Ethernet |
+------------            ------------
+```
+
+Descriptors:
+- Everything in Unix is a file (file, pipe, network connection, etc..)
+- When programs do any I/O they do it by reading/writing to a file descriptor
+- File descriptor is an abstract indicator (integer) associated with an open file
+- File descriptor for network communication returns via socket() syscall (send/recv)
+
+Connection process:
+```
+Socket syscall allocate new structure PCB
+[addr, port, dest addr, dest port, listen?]
+```
+
+Syscall connect is used by client process
+```
+[192.168.0.1, 13001, 225.10.35.15, 8080, -] - socket (client1)
+[192.168.0.2, 13002, 225.10.35.15, 8080, -] - socket (client2)
+```
+
+When server accept connection a new socket is allocated
+```
+[225.10.35.15, 8080, NULL, NULL, TRUE] - socket (server)
+[225.10.35.15, 8080, 192.168.0.1, 13001, -] - socket (fork for client1)
+[225.10.35.15, 8080, 192.168.0.2, 13002, -] - socket (fork for client2)
+```
+After client has connected, send/recv syscall can be used to exchange data
