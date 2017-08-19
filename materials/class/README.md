@@ -155,3 +155,94 @@ Race condition - operation is not executed in proper sequence.<br/>
 When this happens we need some mechanism to be ensured that all ok.<br/>
 Code that uses mutual exclusion to sync its execution called critical section.<br/>
 Only 1 thread at time can execute in the critical section (all other threads will wait).
+
+# Memory Management
+
+Processes use virtual addresses.<br/>
+OS translates virtual address into physical addresses.<br/>
+Processes view memory as one contiguous address space from 0 to N.
+
+Pages:
+- Page Table resides in physical memory (one per process)
+- Pages are fixed-length contiguous block of virtual memory (4KB)
+- Pages moved to disk when memory is full & loaded back when referenced again
+- The address 0x1000 maps to different physical address in different processes
+
+```
+                                          --------
+                                        0 |      |
+   ----------         -----------         --------
+ 0 | page A |       0 | frame 3 |       1 |      |
+   ----------         -----------         --------
+ 1 | page B |       1 |         |       2 |      |
+   ----------         -----------         --------
+ 2 | page C |       2 | frame 5 |       3 |  &A  |
+   ----------         -----------         --------
+ 3 | page D |       3 |         |       4 |      |
+   ----------         -----------         --------
+ 4 | page E |       4 |         |       5 |  &C  |
+   ----------         -----------         --------
+ 5 | page F |       5 | frame 7 |       6 |      |
+   ----------         -----------         --------
+ virtual-memory       page--table       7 |  &F  |
+                                          --------
+                                          physical
+```
+
+Segmentation:
+- Technique that partitions memory into logically related units (code, data, etc..)
+
+```
+--------------------------------
+| SegID      | Base   | Limit  |
+--------------------------------
+| 0 (code)   | 0x4000 | 0x0800 |
+| 1 (data)   | 0x4800 | 0x1400 |
+| 2 (shared) | 0xF000 | 0x1000 |
+| 3 (stack)  | 0x0000 | 0x3000 |
+--------------------------------
+```
+```
+0x0000 ---------                0x0000 ---------- SegID=3
+       |xxxxxxx| ----                  |xxxxxxxx|
+       ---------    | SegID=0          |xxxxxxxx|
+       |       |    |                  |xxxxxxxx|
+       |       |    |                  ----------
+0x4000 ---------    |                  |        |
+       |xxxxxxx|--  ----------> 0x4000 ---------- SegID=0
+       |xxxxxxx| |                     |xxxxxxxx|
+       --------- | SegID=1             |xxxxxxxx|
+       |       | -------------> 0x4800 ---------- SegID=1
+       |       |                       |xxxxxxxx|
+0x8000 ---------                       ----------
+       |xxxxxxx|                       |        |
+       ---------                       |        |
+       |       |                       |        |
+       |       |                       |        |
+0xC000 ---------                       |        |
+       |xxxxxxx|                       |        |
+       |xxxxxxx|                       |        |
+       |xxxxxxx|                       |        |
+       ---------                       |        |
+       |       |                0xF000 ---------- SegID=2
+       |       |                       |xxxxxxxx|
+       ---------                       ----------
+        virtual                         physical
+```
+
+Swapping:
+- What if not all processes fit in memory?
+- In order to make room for next processes, some or all of them moved to disk
+
+```
+-------------             -------------
+|           | swap out    |  ----     |
+|           |-------------|->|P1|     |
+|           |             |  ----     |
+| UserSpace |             |           |
+|           |     swap in |     ----  |
+|           |<------------|-----|P2|  |
+|           |             |     ----  |
+-------------             -------------
+ main memory              backing store
+```
