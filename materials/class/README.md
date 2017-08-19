@@ -246,3 +246,53 @@ Swapping:
 -------------             -------------
  main memory              backing store
 ```
+
+# File System
+
+File is a collection of blocks
+
+Chmod:
+```
+rw- rw- rw- = 110 110 110 (chmod 666)
+rwx --- --- = 111 000 000 (chmod 700)
+rwx r-x r-x = 111 101 101 (chmod 755)
+rwx rwx rwx = 111 111 111 (chmod 777)
+```
+
+Permissions:
+```
+-rwxr-xr-x user:root group:root /bash
+```
+
+File /bin/bash is owned by user 'root'.<br/>
+User 'root' (rwx) can read/write/execute.<br/>
+Members in group 'root' (r-x) can read/execute.<br/>
+Everybody else (r-x) can read/execute this file in system.
+
+Unix inodes:<br/>
+Data structure that contains all information about a file
+
+```
+$ ls -ia /var/ (inode 3633697)
+3633697 .           2 ..     3633701 cache     3633723 log
+```
+```
+$ ls -ia /var/log (inode 3633723)
+3633723 .     3633697 ..     3634833 acpid     3633883 httpd
+```
+```
+-------------------
+| inode structure |
+-------------------
+| mode            | - permissions
+| owner           | - owner/group
+| size            | - size of file (bytes)
+| timestamps      | - inode create/update time
+-------------------
+| direct blocks   | - blocks with file content (file <= 48KB)
+-------------------
+| indirect blocks | - pointer to the next disk block (file <= 4MB)
+| double indirect | - pointer to the next disk block (file <= 4GB)
+| triple indirect | - pointer to the next disk block (file <= 4TB)
+-------------------
+```
