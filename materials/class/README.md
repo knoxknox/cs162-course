@@ -104,7 +104,7 @@ Process execution:
 - When a process is created the OS allocates a PCB for it and places to 'ready' queue
 
 Process representation:
-- Process is instance of executing program (address space + one or more threads)
+- Process is instance of executing program (address space and one or more threads)
 
 ```
  0xFFFFFFFFF       -----------------
