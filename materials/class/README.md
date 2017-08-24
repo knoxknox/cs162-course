@@ -397,3 +397,101 @@ When server accept connection a new socket is allocated
 [225.10.35.15, 8080, 192.168.0.2, 13002, -] - socket (fork for client2)
 ```
 After client has connected, send/recv syscall can be used to exchange data
+
+# Network (TCP/IP)
+
+Layers:
+```
+---------------------------------------------
+| L1 |       ARP, MAC, Ethernet, WiFi       |
+| L2 |               IP, ICMP               |
+| L3 |               TCP, UDP               |
+| L4 | DHCP, DNS, FTP, HTTP, SMTP, SSH, SSL |
+---------------------------------------------
+```
+
+Connection:
+```
+SYN         C --> S     seq=x
+SYN+ACK     C <-- S     seq=y, ack=x+1
+ACK         C --> S     seq=x+1, ack=y+1     CONN_OPEN
+ACK         C --> S     seq=x+1, ack=y+1     SEND_DATA
+...
+FIN+ACK     C --> S     seq=x, ack=y
+ACK         C <-- S     seq=y, ack=x+1       CONN_CLOSE
+FIN+ACK     C <-- S     seq=y, ack=x+1
+ACK         C --> S     seq=x+1, ack=y+1     CONN_CLOSE
+```
+
+Data Transmission:
+```
+user ------------------------------
+ [App]                     |D|     - write(fd, buf, len)
+kernel ----------------------------
+ [File]                            - validate file descriptor
+ [Socket]                  |D|     - append buf to socket buffer
+ [TCP]                 |TCP|D|     - create tcp segment, compute checksum
+ [IP]               |IP|TCP|D|     - ip header, perform routing, checksum
+ [Ethernet]     |ETH|IP|TCP|D|     - add ethernet header to packet, perform arp
+ [NC Driver]                       - tell network interface card to send a packet
+device ----------------------------
+ [NIC]      |IFG|ETH|IP|TCP|D|CRC| - fetch & send packet, interrupt when send is done
+```
+
+IP Header:
+```
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+-----------------------------------------------------------------
+|Version|  IHL  |Type of Service|          Total Length         |
+-----------------------------------------------------------------
+|         Identification        |Flags|      Fragment Offset    |
+-----------------------------------------------------------------
+|  Time to Live |    Protocol   |         Header Checksum       |
+-----------------------------------------------------------------
+|                       Source Address                          |
+-----------------------------------------------------------------
+|                    Destination Address                        |
+-----------------------------------------------------------------
+|                    Options                    |    Padding    |
+-----------------------------------------------------------------
+```
+
+TCP header:
+```
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+-----------------------------------------------------------------
+|          Source Port          |       Destination Port        |
+-----------------------------------------------------------------
+|                        Sequence Number                        |
+-----------------------------------------------------------------
+|                    Acknowledgment Number                      |
+-----------------------------------------------------------------
+|  Data |           |U|A|P|R|S|F|                               |
+| Offset| Reserved  |R|C|S|S|Y|I|            Window             |
+|       |           |G|K|H|T|N|N|                               |
+-----------------------------------------------------------------
+|           Checksum            |         Urgent Pointer        |
+-----------------------------------------------------------------
+|                    Options                    |    Padding    |
+-----------------------------------------------------------------
+|                             data                              |
+-----------------------------------------------------------------
+```
+
+Browser Request:
+1. Parse URL (protocol: 'http', resource: '/')
+2. Convert non-ascii characters in hostname to ascii
+3. Determine http or https via HSTS (HTTP Strict Transport Security)
+4. DNS lookup
+   - check domain in cache
+   - check domain in /hosts file
+   - request to DNS server (returns host name + IP)
+5. ARP broadcast
+   - check ip=mac in cache
+   - request to find mac in network by given ip (returns target IP+MAC)
+6. Create socket via syscall
+   - get ip and port (from url)
+   - build package: TCP + IP + MAC
+7. Packet is ready to be transmitted (WiFi, Ethernet, etc..)
