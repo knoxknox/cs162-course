@@ -146,7 +146,6 @@ Kernel -> Load app code -> Process -> Threads
 Thread creation:
 - Each process has at least one thread
 - Thread is scheduled by operating system
-- It shares the resources with the process
 - Thread is represented with TCB Data Structure
 
 TCB Data Structure:
@@ -204,10 +203,9 @@ Only 1 thread at time can execute in the critical section (all other threads wil
 
 # Memory Management
 
-ADT: PT (Page Table)
+ADT: Page Table
 
-Processes use virtual addresses.<br/>
-OS translates virtual address into physical addresses.<br/>
+Processes use virtual addresses to read/write to memory location.<br/>
 Processes view memory as one contiguous address space from 0 to N.<br/>
 To map virtual addresses to physical addresses OS uses Page Table structure.
 
@@ -376,7 +374,7 @@ Socket = protocol + host + port (ex: 'tcp, 192.44.235.1, 80')
 
 Descriptors:
 - Everything in Unix is a file (file, pipe, network connection, etc..)
-- When programs do any I/O they do it by reading/writing to a file descriptor
+- When programs do any I/O they do it by reading/writing to file descriptor
 - File descriptor is an abstract indicator (integer) associated with an open file
 - File descriptor for network communication returns via socket() syscall (send/recv)
 
