@@ -31,7 +31,7 @@ Example of I/O:
 2. Network Interface Card (NIC) - signals an interrupt
 3. CPU stops current instruction, saves current context
 4. CPU jumps to handler address from kernel vector table
-5. Ethernet device driver reads packet from buffer, processes packet
+5. Ethernet device driver reads packet from buffer, processes it
 6. Kernel restores saved context and reissues interrupted instruction
 
 Interrupt:
@@ -81,6 +81,8 @@ Interrupt:
 ```
 
 # Processes
+
+ADT: PCB (Process Control Block)
 
 Process is the OS abstraction of execution.
 ```
@@ -134,13 +136,57 @@ Address Space:
 
 # Threads
 
+ADT: TCB (Thread Control Block)
+
+Thread is the smallest unit of processing.
+```
+Kernel -> Load app code -> Process -> Threads
+```
+
+Thread creation:
+- Each process has at least one thread
+- Thread is scheduled by operating system
+- It shares the resources with the process
+- Thread is represented with TCB Data Structure
+
+TCB Data Structure:
+```
+tid, state, hardware state (pc, sp, regs), ref to process
+```
+
+```
+ 0xFFFFFFFFF       -----------------
+      |            |   Stack =T1   |
+      |            -----------------
+      |            |   Stack =T2   |
+      |            -----------------
+      |            |   Stack =T3   |
+      |            -----------------
+      |                    |
+      |                    |
+-------------              |
+Address Space              |
+-------------              |
+      |                    |
+      |            -----------------
+      |            |      Heap     |
+      |            -----------------
+      |            |  Data Segment |
+      |            -----------------
+      |            |               | <- PC (T3)
+      |            |  Text Segment | <- PC (T2)
+      |            |               | <- PC (T1)
+ 0x000000000       -----------------
+```
+
 Each thread has its own stack & copy of cpu registers.<br/>
 Shared memory between threads: heap, global vars, static objects.<br/>
-Thread "yield" operation gives up the CPU to another thread (context switch).
+Thread 'yield' operation gives up the CPU to another thread (context switch).
 
 # Synchronization
 
-Lock, Mutex, Monitor, Semaphore, Condition variable
+Hardware: Test & Set, Compare & Swap<br/>
+Lock, Mutex, Monitor, Semaphore, Condition Variable
 
 ```
 | T1 > balance = get_balance(account)
@@ -158,15 +204,18 @@ Only 1 thread at time can execute in the critical section (all other threads wil
 
 # Memory Management
 
+ADT: PT (Page Table)
+
 Processes use virtual addresses.<br/>
 OS translates virtual address into physical addresses.<br/>
-Processes view memory as one contiguous address space from 0 to N.
+Processes view memory as one contiguous address space from 0 to N.<br/>
+To map virtual addresses to physical addresses OS uses Page Table structure.
 
 Pages:
 - Page Table resides in physical memory (one per process)
 - Pages are fixed-length contiguous block of virtual memory (4KB)
 - Pages moved to disk when memory is full & loaded back when referenced again
-- The address 0x1000 maps to different physical address in different processes
+- The address 0x10001000 maps to different physical address in different processes
 
 ```
                                           --------
@@ -176,15 +225,15 @@ Pages:
    ----------         -----------         --------
  1 | page B |       1 |         |       2 |      |
    ----------         -----------         --------
- 2 | page C |       2 | frame 5 |       3 |  &A  |
+ 2 | page C |       2 | frame 5 |       3 |  &A  | <- frame 3
    ----------         -----------         --------
  3 | page D |       3 |         |       4 |      |
    ----------         -----------         --------
- 4 | page E |       4 |         |       5 |  &C  |
+ 4 | page E |       4 |         |       5 |  &C  | <- frame 5
    ----------         -----------         --------
  5 | page F |       5 | frame 7 |       6 |      |
    ----------         -----------         --------
- virtual-memory       page--table       7 |  &F  |
+ virtual-memory       page-table!       7 |  &F  | <- frame 7
                                           --------
                                           physical
 ```
@@ -201,8 +250,7 @@ Segmentation:
 | 2 (shared) | 0xF000 | 0x1000 |
 | 3 (stack)  | 0x0000 | 0x3000 |
 --------------------------------
-```
-```
+
 0x0000 ---------                0x0000 ---------- SegID=3
        |xxxxxxx| ----                  |xxxxxxxx|
        ---------    | SegID=0          |xxxxxxxx|
@@ -249,19 +297,18 @@ Swapping:
 
 # File System
 
-File is a collection of blocks
+ADT: INode (Index Node)
 
-Chmod:
+File is a collection of blocks.
+
+Permissions:
 ```
 rw- rw- rw- = 110 110 110 (chmod 666)
 rwx --- --- = 111 000 000 (chmod 700)
 rwx r-x r-x = 111 101 101 (chmod 755)
 rwx rwx rwx = 111 111 111 (chmod 777)
-```
 
-Permissions:
-```
--rwxr-xr-x user:root group:root /bash
+-rwxr-xr-x user:root group:root /bin/bash
 ```
 
 File /bin/bash is owned by user 'root'.<br/>
@@ -270,16 +317,15 @@ Members in group 'root' (r-x) can read/execute.<br/>
 Everybody else (r-x) can read/execute this file in system.
 
 Unix inodes:<br/>
-Data structure that contains all information about a file
-
+Data structure that contains all information about a file.
 ```
 $ ls -ia /var/ (inode 3633697)
 3633697 .           2 ..     3633701 cache     3633723 log
-```
-```
+
 $ ls -ia /var/log (inode 3633723)
 3633723 .     3633697 ..     3634833 acpid     3633883 httpd
 ```
+
 ```
 -------------------
 | inode structure |
@@ -299,10 +345,13 @@ $ ls -ia /var/log (inode 3633723)
 
 # Sockets
 
+ADT: InPCB (Internet Protocol Control Block)
+
 ```
 User -> Sockets -> OS -> TCP/UDP -> IP -> Ethernet
 Socket = protocol + host + port (ex: 'tcp, 192.44.235.1, 80')
 ```
+
 ```
 ------------            ------------
 |   Send   |            |   Recv   |
