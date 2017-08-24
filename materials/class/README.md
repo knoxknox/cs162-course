@@ -487,11 +487,11 @@ Browser Request:
 4. DNS lookup
    - check domain in cache
    - check domain in /hosts file
-   - request to DNS server (returns host name + IP)
+   - request to DNS server (returns hostname + IP)
 5. ARP broadcast
    - check ip=mac in cache
-   - request to find mac in network by given ip (returns target IP+MAC)
+   - find mac in network by given ip (returns target IP+MAC)
 6. Create socket via syscall
    - get ip and port (from url)
-   - build package: TCP + IP + MAC
-7. Packet is ready to be transmitted (WiFi, Ethernet, etc..)
+   - build packet: TCP + IP + MAC
+7. Packet is ready to be transmitted (Wi-Fi, Ethernet, etc..)
