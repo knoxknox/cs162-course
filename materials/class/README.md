@@ -514,11 +514,11 @@ Browser Request:
 4. DNS lookup
    - check domain in cache
    - check domain in /hosts file
-   - request to DNS server (returns hostname + IP)
+   - request to DNS server (returns Hostname+IP)
 5. ARP broadcast
    - check ip=mac in cache
    - find mac in network by given ip (returns target IP+MAC)
 6. Create socket via syscall
    - get ip and port (from url)
    - build packet: TCP + IP + MAC
-7. Packet is ready to be transmitted (Wi-Fi, Ethernet, etc..)
+7. Packet is ready to be transmitted over network (Wi-Fi, Ethernet, etc..)
