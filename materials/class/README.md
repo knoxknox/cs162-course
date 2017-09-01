@@ -512,12 +512,12 @@ Browser Request:
 2. Convert non-ascii characters in hostname to ascii
 3. Determine http or https via HSTS (HTTP Strict Transport Security)
 4. DNS lookup
-   - check domain in cache
+   - check cache (domain=ip)
    - check domain in /hosts file
    - request to DNS server (returns Hostname+IP)
 5. ARP broadcast
-   - check ip=mac in cache
-   - find mac in network by given ip (returns target IP+MAC)
+   - check cache (ip=mac)
+   - find mac in subnet by given ip (returns target IP+MAC)
 6. Create socket via syscall
    - get ip and port (from url)
    - build packet: TCP + IP + MAC
