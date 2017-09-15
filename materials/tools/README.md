@@ -18,6 +18,7 @@
 ### Network:
 - nc - send/receive packets (`nc -v <host> <port>`)
 - dig - domain information (`dig <host>` / `dig -x <ip>`)
+- lsof - connections by process (`lsof -i | grep <name>`)
 - nmap - show opened network ports (`nmap -sT -O <host>`)
 - ngrep - show network requests (`ngrep -d any <sitename>`)
 - netstat - info about network connections (`sudo netstat -tunapl`)
