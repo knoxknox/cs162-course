@@ -1,6 +1,6 @@
 # Tools
-<a href="https://goo.gl/DkewAm">
-  <img width="640px" src="https://goo.gl/XNU81X"/>
+<a href="https://bit.ly/2HKY2iJ">
+  <img width="640px" src="https://bit.ly/2Hw5gco"/>
 </a>
 
 ### Utils:
