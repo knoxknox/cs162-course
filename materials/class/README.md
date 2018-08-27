@@ -474,6 +474,10 @@ ARP:
 
 DHCP:
 ```
+DISCOVER    C --> S     Client broadcasts DHCP Discover
+OFFER       C <-- S     Server replies with Offer message
+REQUEST     C --> S     Client broadcasts DHCP Request message
+ACK         C <-- S     Server replies with Acknowledge message
 ```
 
 IP Header:
