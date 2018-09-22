@@ -398,6 +398,67 @@ When server accept connection a new socket is allocated
 ```
 After client has connected, send/recv syscall can be used to exchange data
 
+# I/O Model
+
+Phases of any input operation:
+- Waiting for data to be ready
+- Copying data from kernel to process
+
+There are 5 types of I/O models:
+- Blocking I/O
+- Non-Blocking I/O
+- I/O Multiplexing
+- Asynchronous I/O (AIO)
+- Signal-Driven I/O (SIGIO)
+
+I/O Multiplexing:
+- Allows to monitor a lot of file descriptors for new I/O
+- Who needs to watch a lot of file descriptors at a time? Servers!
+
+```
+----------
+| Server | <-- accept connection
+----------
+    |
+    |--------> calls `accept` system call
+               new file descriptor represents connection
+
+For example we need to handle 10K connections:
+for x in open_connections -> if has_new_input(x) -> process_input(x)
+
+This can waste a lot of CPU time. Instead we can ask kernel about updates.
+```
+
+File descriptors monitoring:
+- poll (Unix): waits for one of a set of FD to become ready to perform I/O
+- epoll (Linux): monitor multiple FD to see if I/O is possible on any of them
+- select (Unix): monitor multiple FD waiting until FD become ready for I/O ops
+
+poll/select:
+- Fundamentally use the same code (poll ~= select)
+- Give a list of file descriptors to get information about
+- They tell you which ones have data available to read/write to
+
+```
+poll: monitor [1,3,7,8] file descriptors => it will monitor only 4 FD (1,3,7,8)
+select: monitor 19 file descriptors with 3 bitsets => it will monitor 19 FD (0 to 19)
+```
+
+epoll (Linux 2.5+):
+- Provides 3 syscalls: epoll_ctl, epoll_wait, epoll_create
+- Give kernel a list of file descriptors to track and ask for updates
+- Faster then poll/select, because kernel should not check all descriptors in a loop
+
+```
+epoll_create: tell the kernel for epolling (returns id)
+epoll_ctl: tell the kernel file descriptors you are interested in updates about
+epoll_wait: waits for i/o events, blocking the calling thread if no events available
+```
+
+Ways to get notifications:
+- edge-triggered: get notifications every time a file descriptor becomes readable
+- level-triggered: get a list of every file descriptor you're interested in that is readable
+
 # Network (TCP/IP)
 
 Layers:
