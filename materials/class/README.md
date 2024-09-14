@@ -185,7 +185,8 @@ Thread 'yield' operation gives up the CPU to another thread (context switch).
 # Synchronization
 
 Hardware: Test & Set, Compare & Swap<br/>
-Lock, Mutex, Monitor, Semaphore, Condition Variable
+Sync primitives: Lock, Mutex, Monitor, Semaphore, Condition Variable<br/>
+IPC: File, Pipe, Queue, Signal, Socket, Shared Memory, Memory-Mapped File (mmap)
 
 ```
 | T1 > balance = get_balance(account)
