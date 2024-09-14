@@ -1,12 +1,14 @@
 # Notes
 
-1. Intro
-2. Processes
-3. IPC & Threads
-4. Synchronization
-5. Memory Management
-6. File System (FS/AFS/NFS)
-7. Network (Sockets, TCP/IP)
+1. [Intro](#intro)
+2. [Processes](#processes)
+3. [Threads](#threads)
+4. [Synchronization](#synchronization)
+5. [Memory Management](#memory-management)
+6. [File System](#file-system)
+7. [Sockets](#sockets)
+8. [I/O Model](#io-model)
+9. [Network (TCP/IP)](#network-tcpip)
 
 # Intro
 
